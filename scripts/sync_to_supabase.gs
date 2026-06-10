@@ -8,9 +8,13 @@
 const SUPABASE_URL = "https://kanzirszawsgwpltdsyr.supabase.co";
 const SUPABASE_KEY = "YOUR_ANON_KEY_HERE"; // reemplazar con la clave anon de Supabase
 
-function excelDateToISO(serial) {
-  if (serial === null || serial === undefined || serial === "" || serial === 0) return null;
-  const num = parseFloat(serial);
+function excelDateToISO(value) {
+  if (value === null || value === undefined || value === "") return null;
+  if (value instanceof Date) {
+    if (isNaN(value.getTime())) return null;
+    return value.toISOString();
+  }
+  const num = parseFloat(value);
   if (isNaN(num) || num < 1) return null;
   try {
     const date = new Date((num - 25569) * 86400 * 1000);
@@ -21,9 +25,13 @@ function excelDateToISO(serial) {
   }
 }
 
-function excelDateToDate(serial) {
-  if (serial === null || serial === undefined || serial === "" || serial === 0) return null;
-  const num = parseFloat(serial);
+function excelDateToDate(value) {
+  if (value === null || value === undefined || value === "") return null;
+  if (value instanceof Date) {
+    if (isNaN(value.getTime())) return null;
+    return value.toISOString().split("T")[0];
+  }
+  const num = parseFloat(value);
   if (isNaN(num) || num < 1) return null;
   try {
     const date = new Date((num - 25569) * 86400 * 1000);
