@@ -149,7 +149,8 @@ function syncCacheShortlisted() {
       contacted_on: excelDateToISO(r[25]),
       is_hired_same_client: toBoolean(r[26]),
       is_hired_different_client: toBoolean(r[27]),
-      has_firstwork: toBoolean(r[28])
+      has_firstwork: toBoolean(r[28]),
+      clara_score: parseFloat(r[29]) || null
     });
   }
   upsertToSupabase("cache_shortlisted", rows);
@@ -176,7 +177,8 @@ function syncStatusVacancies() {
       shift_pattern: r[8] || null,
       workplace_id: r[9] || null,
       flow_version: parseFloat(r[10]) || null,
-      applicants_count: parseInt(r[11]) || 0
+      applicants_count: parseInt(r[11]) || 0,
+      vr_url: r[12] || null
     });
   }
   upsertToSupabase("status_vacancies", rows);

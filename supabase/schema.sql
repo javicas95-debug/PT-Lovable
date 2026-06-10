@@ -41,6 +41,7 @@ CREATE TABLE status_vacancies (
   shift_pattern text,
   flow_version numeric,
   applicants_count integer DEFAULT 0,
+  vr_url text,
   imported_at timestamptz DEFAULT now()
 );
 
@@ -74,6 +75,7 @@ CREATE TABLE cache_shortlisted (
   is_hired_same_client boolean DEFAULT false,
   is_hired_different_client boolean DEFAULT false,
   has_firstwork boolean DEFAULT false,
+  clara_score numeric,
   imported_at timestamptz DEFAULT now()
 );
 
