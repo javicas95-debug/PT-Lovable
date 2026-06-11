@@ -154,7 +154,41 @@ function syncCacheShortlisted() {
     });
   }
   upsertToSupabase("cache_shortlisted", rows);
+  deleteOldCacheShortlisted();
 }
+
+// Borra de Supabase las filas con lead_created_at anterior a la ventana
+// de 3 meses desde el lunes de la semana actual, igual que el filtro del query.
+function deleteOldCacheShortlisted() {
+  const today = new Date();
+  const day = today.getDay(); // 0=domingo, 1=lunes...
+  const diffToMonday = (day === 0 ? -6 : 1 - day);
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + diffToMonday);
+  monday.setHours(0, 0, 0, 0);
+
+  const cutoff = new Date(monday);
+  cutoff.setMonth(cutoff.getMonth() - 3);
+  const cutoffISO = cutoff.toISOString();
+
+  const url = `${SUPABASE_URL}/rest/v1/cache_shortlisted?lead_created_at=lt.${encodeURIComponent(cutoffISO)}`;
+  const options = {
+    method: "DELETE",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
+    },
+    muteHttpExceptions: true
+  };
+  const response = UrlFetchApp.fetch(url, options);
+  const code = response.getResponseCode();
+  if (code !== 200 && code !== 204) {
+    Logger.log(`Error borrando filas antiguas de cache_shortlisted: ${response.getContentText()}`);
+  } else {
+    Logger.log(`🗑️ cache_shortlisted: filas anteriores a ${cutoffISO.split("T")[0]} eliminadas`);
+  }
+}
+
 
 function syncStatusVacancies() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("status_vacancies");
