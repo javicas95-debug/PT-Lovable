@@ -110,6 +110,16 @@ CREATE TABLE candidate_comments (
   created_at timestamptz DEFAULT now()
 );
 
+CREATE TABLE appointments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  lead_uid uuid REFERENCES cache_shortlisted(lead_uid),
+  appointment_date date,
+  appointment_time time,
+  attended text, -- 'yes' | 'no' | null (pending)
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
 -- Desactivar RLS para desarrollo
 ALTER TABLE status_vacancies DISABLE ROW LEVEL SECURITY;
 ALTER TABLE fw_applications DISABLE ROW LEVEL SECURITY;
