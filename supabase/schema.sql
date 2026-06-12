@@ -107,8 +107,11 @@ CREATE TABLE candidate_comments (
   lead_uid uuid,
   author_email text,
   body text NOT NULL,
-  created_at timestamptz DEFAULT now()
+  comment_type text,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
 );
+-- Unique index on (lead_uid, comment_type) for upsert on_conflict
 
 CREATE TABLE appointments (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
