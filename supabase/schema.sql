@@ -107,11 +107,15 @@ CREATE TABLE candidate_comments (
   lead_uid uuid,
   author_email text,
   body text NOT NULL,
-  comment_type text,
+  comment_type text, -- 'extra_step' (single status row per lead) | 'comment' (free-form, multiple per lead)
+  related_step text, -- for comment_type = 'comment': optional status this comment relates to
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
--- Unique index on (lead_uid, comment_type) for upsert on_conflict
+-- One 'extra_step' row per lead_uid (acts as upsert target); 'comment' rows are unrestricted
+CREATE UNIQUE INDEX candidate_comments_extra_step_uidx
+  ON candidate_comments (lead_uid)
+  WHERE comment_type = 'extra_step';
 
 CREATE TABLE appointments (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
