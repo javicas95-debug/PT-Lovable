@@ -32,8 +32,7 @@
  * - Se añaden Phone Number, Email, Current Stage y Application ID a la
  *   salida, para que el equipo de llamadas tenga todo en una fila.
  * - Fechas calculadas en Europe/London (US usaba Europe/Madrid).
- * - ID: workerId > prospect_<prospectId> > application_<Application ID>
- *   (este último fallback no existía en US).
+ * - ID: workerId > prospect_<prospectId>. Sin ninguno -> se descarta.
  *
  * USO
  * ---
@@ -206,12 +205,8 @@ function buildAppointmentsDF() {
     if (names.length === 0 && times.length === 0) continue;
 
     // Mismo criterio que US: workerId preferente, si no prospect_<id>.
-    // En UK ~10% de candidatos con cita no tienen ninguno de los dos todavía:
-    // se usa application_<Application ID> para no perder esas llamadas.
-    const id = worker ? worker
-      : prospect ? 'prospect_' + prospect
-      : applicationId ? 'application_' + applicationId
-      : '';
+    // Sin ninguno de los dos la cita se descarta (va a data_error_reports).
+    const id = worker ? worker : (prospect ? 'prospect_' + prospect : '');
 
     const pushError = (eventName, startLocal, dateKey, reason) => {
       if (!inCaptureWindow(dateKey)) return;
@@ -254,7 +249,7 @@ function buildAppointmentsDF() {
 
       // ---- Validaciones (van a data_error_reports, no a clean) ----
       let reason = '';
-      if (!id) reason = 'Missing workerId, prospectId and Application ID';
+      if (!id) reason = 'Missing workerId and prospectId';
       else if (!bookingId) reason = 'Missing Booking ID';
       else if (!location) reason = 'Empty event location';
       else if (/PENDING/i.test(location)) reason = 'PENDING location';
